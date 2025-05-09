@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - BlogifyX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212; /* Dark background */
+            color: #f8f9fa; /* Light text for contrast */
+            font-family: Arial, sans-serif;
+        }
+        .about-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #1c1c1c; /* Slightly lighter dark background */
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+        }
+        .section-heading {
+            font-size: 1.8rem;
+            color: #00bcd4; /* Cyan color for headings */
+            margin-bottom: 15px;
+        }
+        .head-photo img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            display: block;
+            margin: 0 auto 15px;
+        }
+        .btn-contact {
+            background-color: #00bcd4;
+            color: #121212;
+        }
+        .btn-contact:hover {
+            background-color: #008ba3;
+        }
+        .icon {
+            font-size: 1.2rem;
+            color: #00bcd4;
+        }
+        .icon:hover {
+            color: #008ba3;
+        }
+        @media (max-width: 550px) {
+.oks{
+      margin-left: -70px;
+    }
+}
+    </style>
+</head>
+<body>
+    <%- include('./partials/nav') %>
+    <div class="d-flex">
+        <%- include('./partials/sidemenu') %>
+        <div class="oks container mt-3 flex-grow-1"style="">
+            <div class="card-container" style="margin-left: 150px;">
+                <div id="mainContent">
+                    <h1>Follower Statistics</h1>
+                    <div id="followerChartContainer">
+                        <canvas id="followerChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                <div id="graphsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        async function fetchLikesStats() {
+            try {
+                // Fetch the raw data from the backend
+                const response = await fetch("/user/blogs/likes-stats");
+                const result = await response.json();
+    
+                // Log the raw response for debugging
+                console.log("Raw Response:", JSON.stringify(result, null, 2));
+    
+                if (result.success) {
+                    // Transform the response to handle ObjectIDs
+                    const transformedData = transformResponse(result.data);
+    
+                    // Log the transformed response for debugging
+                    console.log("Transformed Response:", JSON.stringify(transformedData, null, 2));
+    
+                    // Render graphs with the transformed data
+                    renderGraphs(transformedData);
+                } else {
+                    console.error("Error fetching likes stats:", result.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+    
+        // Function to transform the response, converting ObjectIDs to strings
+        function transformResponse(data) {
+            return JSON.parse(
+                JSON.stringify(data, (key, value) => {
+                    if (key === "_id" && typeof value === "object" && value.toString) {
+                        return value.toString(); // Convert ObjectID to string
+                    }
+                    return value; // Return other values as is
+                })
+            );
+        }
+    
+        // Function to render graphs based on the transformed data
+        function renderGraphs(data) {
+            const container = document.getElementById("graphsContainer");
+            container.innerHTML = ""; // Clear any previous graphs
+    
+            data.forEach((blog, index) => {
+                // Create a canvas for each graph
+                const canvas = document.createElement("canvas");
+                canvas.id = `blogGraph-${index}`;
+                canvas.width = 400;
+                canvas.height = 200;
+                container.appendChild(canvas);
+    
+                // Extract dates and counts for the graph
+                const dates = blog.data.map(entry => entry.date);
+                const counts = blog.data.map(entry => entry.count);
+    
+                // Initialize the graph using Chart.js
+                const ctx = canvas.getContext("2d");
+                new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: `Likes for "${blog.blogTitle}"`,
+                                data: counts,
+                                borderColor: "rgba(0, 188, 212, 1)",
+                                backgroundColor: "rgba(0, 188, 212, 0.3)",
+                                tension: 0.3,
+                                fill: true,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: "top",
+                                labels: {
+                                    color: "#ffffff",
+                                },
+                            },
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: "#ffffff" },
+                                title: {
+                                    display: true,
+                                    text: "Date",
+                                    color: "#ffffff",
+                                },
+                            },
+                            y: {
+                                ticks: { color: "#ffffff" },
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: "Number of Likes",
+                                    color: "#ffffff",
+                                },
+                            },
+                        },
+                    },
+                });
+    
+                console.log(`Graph created for blog: ${blog.blogTitle}`);
+            });
+        }
+    
+        // Call the function to fetch and handle likes stats
+        fetchLikesStats();
+    </script>
+    
+     <script>
+    async function fetchLikesStats() {
+        try {
+            const response = await fetch("/user/blogs/likes-stats");
+            const result = await response.json();
+
+            // Log the raw response for debugging
+            console.log("Raw Response:", JSON.stringify(result, null, 2));
+
+            if (result.success) {
+                // Transform the response to replace any `_id` fields with string equivalents
+                const transformedData = transformResponse(result.data);
+
+                // Log the transformed response for debugging
+                console.log("Transformed Response:", JSON.stringify(transformedData, null, 2));
+
+                const container = document.getElementById("graphsContainer");
+                container.innerHTML = ""; // Clear previous graphs
+
+                // Use the transformed data for graph plotting
+                transformedData.forEach((blog, index) => {
+                    const canvas = document.createElement("canvas");
+                    canvas.id = `blogGraph-${index}`;
+                    canvas.width = 400;
+                    canvas.height = 200;
+                    container.appendChild(canvas);
+
+                    const dates = blog.data.map(entry => entry.date);
+                    const counts = blog.data.map(entry => entry.count);
+
+                    const ctx = canvas.getContext("2d");
+                    new Chart(ctx, {
+                        type: "line",
+                        data: {
+                            labels: dates,
+                            datasets: [
+                                {
+                                    label: `Likes for "${blog.blogTitle}"`,
+                                    data: counts,
+                                    borderColor: "rgba(0, 188, 212, 1)",
+                                    backgroundColor: "rgba(0, 188, 212, 0.3)",
+                                    tension: 0.3,
+                                    fill: true,
+                                },
+                            ],
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: "top",
+                                    labels: {
+                                        color: "#ffffff",
+                                    },
+                                },
+                            },
+                            scales: {
+                                x: {
+                                    ticks: { color: "#ffffff" },
+                                    title: {
+                                        display: true,
+                                        text: "Date",
+                                        color: "#ffffff",
+                                    },
+                                },
+                                y: {
+                                    ticks: { color: "#ffffff" },
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: "Number of Likes",
+                                        color: "#ffffff",
+                                    },
+                                },
+                            },
+                        },
+                    });
+                    console.log(`Graph created for blog: ${blog.blogTitle}`);
+                });
+            } else {
+                console.error("Error fetching likes stats:", result.message);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
+    // Function to transform the response, converting ObjectIDs to strings
+    function transformResponse(data) {
+        // Recursively traverse and transform `_id` fields in the data
+        return JSON.parse(
+            JSON.stringify(data, (key, value) => {
+                if (key === "_id" && typeof value === "object" && value.toString) {
+                    return value.toString(); // Convert ObjectID to string
+                }
+                return value; // Return other values as is
+            })
+        );
+    }
+
+    // Call the function to fetch and handle likes stats
+    fetchLikesStats();
+</script>
+
+
+    <script>
+        // Data passed from the backend (Example structure)
+        const dates = <%- JSON.stringify(dates) %>; // Rendered array of dates
+        const counts = <%- JSON.stringify(counts) %>; // Rendered array of counts
+
+        // Plot the follower statistics line chart (as per your original chart)
+        const ctx = document.getElementById('followerChart').getContext('2d');
+        const followerChart = new Chart(ctx, {
+            type: 'line', // Line chart
+            data: {
+                labels: dates, // X-axis: Dates
+                datasets: [{
+                    label: 'Followers Gained Per Day',
+                    data: counts, // Y-axis: Counts
+                    borderColor: '#00bcd4', // Cyan line color
+                    backgroundColor: 'rgba(0, 188, 212, 0.2)', // Light transparent cyan fill below the line
+                    borderWidth: 2,
+                    tension: 0.3, // Smooth curves
+                    pointBackgroundColor: '#ffffff', // White data points
+                    pointBorderColor: '#00bcd4', // Cyan border around points
+                    pointRadius: 4 // Point size
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#ffffff' // White legend text for night mode
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#ffffff' // White X-axis labels
+                        },
+                        title: {
+                            display: true,
+                            text: 'Date',
+                            color: '#ffffff' // White X-axis title
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#ffffff' // White Y-axis labels
+                        },
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Followers',
+                            color: '#ffffff' // White Y-axis title
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

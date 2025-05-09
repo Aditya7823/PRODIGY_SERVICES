@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('/images/signinback.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .signup-container {
+      background-color: #e7e7e7;
+      border-radius: 10px;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      color: #333;
+    }
+
+    .signup-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #444;
+    }
+
+    .signup-container form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .signup-container input {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .signup-container input:focus {
+      outline: none;
+      border-color: #888;
+    }
+
+    .signup-container button {
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .signup-container button:hover {
+      background-color: #555;
+    }
+
+    .signup-container .signin-option {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .signup-container .signin-option a {
+      color: #555;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .signup-container .signin-option a:hover {
+      text-decoration: underline;
+    }
+
+    .otp-section {
+      display: none;
+      margin-bottom: 15px;
+    }
+    @media(max-width:400px)
+    {
+      .signup-container{
+        margin-left: 30px;
+    margin-right: 30px;
+}
+      }
+    
+
+  </style>
+</head>
+<body>
+  <div class="signup-container">
+    <h2>Sign Up</h2>
+    <form id="signupForm">
+      <input type="text" name="fullname" id="fullname" placeholder="Full Name" required>
+      <input type="email" name="email" id="email" placeholder="Email Address" required>
+      <input type="password" name="password" id="password" placeholder="Password" required>
+      <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" required>
+      <button type="button" id="getOtpBtn">Get OTP</button>
+
+      <!-- OTP Section -->
+      <div class="otp-section">
+        <input type="text" id="otp" placeholder="Enter OTP" required>
+        <button type="button" id="verifyOtpBtn">Verify OTP & Sign Up</button>
+      </div>
+    </form>
+    <div class="signin-option">
+      Already have an account? <a href="/user/signin">Sign In</a>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    document.getElementById('getOtpBtn').addEventListener('click', async function () {
+      const email = document.getElementById('email').value;
+
+      if (!email) {
+        alert('Please enter a valid email.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/user/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        if (response.ok) {
+          alert('OTP sent to your email!');
+          document.querySelector('.otp-section').style.display = 'block';
+        } else {
+          const errorMessage = await response.text();
+          alert(errorMessage);
+        }
+      } catch (error) {
+        alert('Error sending OTP. Please try again later.');
+      }
+    });
+
+    document.getElementById('verifyOtpBtn').addEventListener('click', async function () {
+      const fullname= document.getElementById('fullname').value;
+      const enteredOtp = document.getElementById('otp').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!enteredOtp) {
+        alert('Please enter the OTP.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/user/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({  fullname,email, password, otp: enteredOtp }),
+        });
+
+        if (response.ok) {
+          alert('OTP verified and sign up successful!');
+          window.location.href = '/user/signin';
+        } else {
+          const errorMessage = await response.text();
+          alert(errorMessage);
+        }
+      } catch (error) {
+        alert('Error verifying OTP. Please try again later.');
+      }
+    });
+  </script>
+</body>
+</html>

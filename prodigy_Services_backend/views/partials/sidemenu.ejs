@@ -1,0 +1,261 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+
+
+<div class="side-menu" id="sideMenu">
+    <div class="side-menu-header"  >
+
+        <% if (user) { %>
+            <!-- Profile Section -->
+            <div class="" class="rounded-circle" style="justify-content: center;   "  >
+                <img  
+                style="margin-left: 5px;   border: 3px solid rgb(126, 126, 126);"
+                    src="<%= user.profileImageUrl || '/images/profile.png' %>" 
+                    alt="Profile" 
+                    width="70" 
+                    height="70" 
+                    class="rounded-circle"
+                    onerror="this.src='/images/default-profile.png';" 
+                >
+                
+            </div>
+        
+            <!-- Followers and Followings Section -->
+            <div class="d-flex justify-content-between mt-3">
+                <a href="/followers" class="text-decoration-none text-center w-50 me-2">
+                    <i style="color: rgb(133, 133, 133);" class="bi bi-person-plus fs-4"></i>
+                    <div  class=" okok"style="color: rgb(133, 133, 133);">Followers</div>
+                </a>
+                <a href="/followings/<%= user._id %>" class="text-decoration-none text-center w-50">
+                    <i  style="color: rgb(133, 133, 133);"class="bi bi-person-check fs-4"></i>
+                    <div    class=" okok" style="color: rgb(133, 133, 133);">Followings</div>
+                </a>
+            </div>
+        
+        
+        
+        <% }
+        else { %>
+            <div class="user-profile">
+                <img 
+                    src="/images/default-profile.png" 
+                    alt="Guest Profile" 
+                    width="50" 
+                    height="50" 
+                    class="rounded-circle"
+                >
+                <span class="ms-2">Guest</span>
+            </div>
+        <% } %>
+    </div>
+    <div class="side-menu-items">
+        <!-- My Home -->
+        <a href="/myhome" class="side-menu-item">
+            <i class="bi bi-house-door"></i>
+            <span>My Home</span>
+        </a>
+    
+        <!-- Add Blog -->
+        <a href="/blog/add-blog" class="side-menu-item">
+            <i class="bi bi-plus-square"></i>
+            <span>Add Blog</span>
+        </a>
+    
+        <!-- Profile -->
+        <a href="/profile" class="side-menu-item">
+            <i class="bi bi-person"></i>
+            <span>Profile</span>
+        </a>
+    
+        <!-- Settings -->
+        <a href="/settings" class="side-menu-item">
+            <i class="bi bi-gear"></i>
+            <span>Settings</span>
+        </a>
+    
+        <!-- Comments -->
+        <a href="/comments" class="side-menu-item">
+            <i class="bi bi-substack"></i>
+            <span>My Blogs</span>
+        </a>
+    
+        <!-- Stats -->
+        <a href="/stats" class="side-menu-item">
+            <i class="bi bi-bar-chart-line"></i>
+            <span>Stats</span>
+        </a>
+    
+        
+    
+        <!-- Logout -->
+        <a href="/logout" class="side-menu-item">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+    
+</div>
+<style>
+
+
+
+    /* General styles for the side menu */
+.side-menu {
+    position: fixed;
+    top: 30;
+    left: 0;
+    width: 250px; /* Default width */
+    height: 100vh; /* Full height */
+    background-color: #181818; /* Dark background color for night mode */
+    color: #fff;
+    font-family: Arial, sans-serif;
+    padding-top: 20px;
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+    top: 30px;
+}
+
+/* Hamburger Icon */
+.hamburger-icon {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    display: none; /* Default hidden */
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+/* Side Menu Header */
+.side-menu-header {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 2px solid #333;
+    position: relative; /* For positioning the hamburger icon */
+}
+
+.side-menu-brand {
+    font-size: 24px;
+    font-weight: bold;
+    color: #f0f0f0;
+    text-decoration: none;
+}
+
+/* Side Menu Items */
+.side-menu-items {
+    flex-grow: 1;
+    padding: 20px 0;
+    list-style-type: none;
+    margin: 0;
+}
+
+.side-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #d1d1d1;
+    font-size: 18px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.side-menu-item:hover {
+    background-color: #444;
+    color: #fff;
+    border-radius: 5px;
+}
+
+.side-menu-item i {
+    font-size: 22px;
+    margin-right: 15px;
+}
+
+/* Active Item Styling */
+.side-menu-item.active {
+    background-color: #030303;
+    color: #fff;
+}
+
+/* Media Query for Responsive Collapse */
+@media (max-width: 768px) {
+    .side-menu {
+        transform: translateX(-20px); /* Hide side menu */
+        width: 30%;
+         /* Collapse to full width when toggled */
+    }
+ 
+
+    .side-menu.open {
+        transform: translateX(0); /* Show side menu */
+    }
+
+    .hamburger-icon {
+        display: block; /* Show hamburger icon on smaller screens */
+    }
+}
+
+@media (max-width: 550px) {
+.okok{
+        display: none;
+    }
+}
+
+@media (max-width: 400px) {
+    .side-menu {
+        transform: translateX(-20px); /* Hide side menu */
+        width: 20%;
+         /* Collapse to full width when toggled */
+    }
+    .okok{
+        display: none;
+    }
+    .div a div{
+        display: none;
+    }
+    a.side-menu-item{
+        margin-left: 15px;
+    } 
+    .rounded-circle {
+       height: 40px;
+       width: 40px;
+      
+     
+    }
+    div{
+        color: white;
+    }
+ 
+  a.side-menu-item span{
+    display: none;
+  }
+    .side-menu.open {
+        transform: translateX(0); /* Show side menu */
+    }
+
+    .hamburger-icon {
+        display: block; /* Show hamburger icon on smaller screens */
+    }
+}
+
+</style>
+<script>
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const sideMenu = document.getElementById("sideMenu");
+    const hamburgerIcon = document.getElementById("hamburgerIcon");
+
+    // Toggle the menu open/close on click
+    hamburgerIcon.addEventListener("click", function () {
+        sideMenu.classList.toggle("open");
+    });
+});
+
+</script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">  

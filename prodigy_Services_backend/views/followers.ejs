@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Followers</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS for Dark Theme -->
+    <style>
+        body {
+            background-color: #121212; /* Dark background */
+            color: #ffffff; /* White text */
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            margin-top: 50px;
+            background-color: #1e1e1e; /* Dark container background */
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        h2 {
+            color: #ffffff; /* White title */
+            text-align: center;
+        }
+
+        .list-group {
+            background-color: #2c2c2c; /* Slightly lighter dark background for list */
+            border-radius: 10px;
+        }
+
+        .list-group-item {
+            background-color: #333333; /* Darker background for each item */
+            color: #ffffff; /* White text for items */
+            border: none; /* Remove borders */
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .list-group-item:hover {
+            background-color: #444444; /* Slight hover effect */
+        }
+
+        .list-group-item img {
+            border: 2px solid #ffffff; /* White border around profile images */
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .list-group-item h5 {
+            color: #f0f0f0; /* Lighter white color for names */
+        }
+
+        .list-group-item p {
+            color: #aaaaaa; /* Grey color for emails */
+        }
+
+        .alert-info {
+            background-color: #444444;
+            color: #ffffff;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .sidemenu {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            top: 30px;
+        }
+
+        .nav-bar {
+            background-color: #333333;
+            padding: 10px;
+        }
+
+        .nav-bar a {
+            color: white;
+            padding: 10px;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+
+        .nav-bar a:hover {
+            background-color: #444444;
+            border-radius: 5px;
+        }
+        .sidemenu{
+            top: 30px;
+        }
+       
+@media (max-width: 400px) {
+
+ .follower{
+     margin-left: -200px;
+     width: 250px;
+ }
+
+
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Include the Side Menu -->
+    
+    <%- include('./partials/nav') %>  
+    
+    <!-- Main Content Area -->
+    <div class="content-area" style="margin-left: 270px; padding: 20px;">
+        <!-- Include the Navbar -->
+        <%- include('./partials/sidemenu') %>  
+
+        <!-- Followers List -->
+        <div class="container  follower">
+            <h2 class="mb-4">Your Followers</h2>
+            <div class="list-group">
+                <% if (followers.length > 0) { %>
+                    <% followers.forEach(f => { %>
+                        <div class="list-group-item d-flex align-items-center">
+                            <!-- Profile Image -->
+                            <img 
+                                src="<%= f.follower.profileImageUrl || '/images/default-profile.png' %>" 
+                                alt="Profile" 
+                                class="rounded-circle me-3"
+                                width="50"
+                                height="50"
+                                onerror="this.src='/images/default-profile.png';"
+                            >
+                            <!-- Follower Name -->
+                            <div>
+                                <h5 class="mb-1"><%= f.follower.fullname %></h5>
+                                <p class="mb-0 text-muted"><%= f.follower.email %></p>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="alert alert-info">You don't have any followers yet.</div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

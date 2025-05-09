@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Include head partial for meta tags, styles, etc. -->
+    <%- include('./partials/head') %>
+
+    <!-- Add custom styles for blog layout -->
+    <style>
+        /* Style for the card container */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 60px;
+            justify-content: center;
+        }
+
+        /* Each card style */
+        .card {
+            width: 100%; /* Default width (full width on small screens) */
+            max-width: 300px; /* Maximum width for cards */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px #ddd;
+            transition: transform 0.3s ease-in-out;
+            background-image: url('/images/grey.avif');
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: #000000;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 8px 16px;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        /* Hover effect for cards */
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        /* Responsive design */
+        @media (min-width: 1200px) {
+            .card {
+                width: 30%; /* 3 cards per row for larger screens */
+            }
+        }
+
+        @media (max-width: 1199px) and (min-width: 768px) {
+            .card {
+                width: 45%; /* 2 cards per row for medium screens */
+            }
+        }
+
+        @media (max-width: 767px) {
+            .card {
+                width: 100%; /* 1 card per row for small screens */
+            }
+        }
+
+        @media (max-width: 400px) {
+            .myok {
+                margin-left: -90px;
+                margin-right: 10px;
+            }
+        }
+
+        body {
+            background-image: url('/images/okok.avif');
+            background-repeat: no-repeat;       /* Prevents the image from repeating */
+            background-size: cover;            /* Scales the image to cover the entire viewport */
+            background-position: center center; /* Centers the image both vertically and horizontally */
+            background-attachment: fixed;      /* Keeps the image fixed while scrolling */
+        }
+    </style>
+</head>
+<body>
+   <%- include('./partials/nav') %>
+
+<div class="d-flex">
+    <!-- Side Menu -->
+    <%- include('./partials/sidemenu') %>
+    
+    <!-- Blog Cards Container -->
+    <div class="container mt-3 flex-grow-1 myok">
+        <!-- Loop through all blogs and display them as Bootstrap cards -->
+        <div class="card-container" style="margin-left: 150px;">
+            <% blogs.forEach(blog => { %>
+                <div class="card mb-3">
+                    <img src="<%= blog.coverImageURL ? blog.coverImageURL : '/uploads/defaultblogimage.jpg' %>" class="card-img-top" alt="Cover Image">
+                    <div class="card-body">
+
+                        <h5 class="card-title"><%= blog.title %></h5>
+
+                        <p class="card-text" id="blog-body-<%= blog._id %>" style="max-height: 50px; overflow: hidden;">
+                            <%= blog.body.split(' ').slice(0, 15).join(' ') %><%= blog.body.split(' ').length > 15 ? '...' : '' %>
+                        </p>
+                                            
+                        <button class="btn btn-primary" id="toggle-btn-<%= blog._id %>" 
+                            onclick="logAndRedirect('<%= blog._id %>', <%= JSON.stringify(user || null) %>)"
+                            style="background-color: rgb(0, 0, 0);">
+                            Read More
+                        </button>
+                        
+                        <!-- Actions Container: Like, Follow, Share -->
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <!-- Like Option -->
+                            <span class="text-primary like-option" 
+                                  onclick="likeBlog('<%= blog._id %>', '<%= user ? user._id : null %>')"
+                                  style="cursor: pointer; font-weight: bold;">
+                                <i class="bi <%= likedBlogs.includes(blog._id.toString()) ? 'bi-heart-fill' : 'bi-heart' %>" 
+                                   id="like-icon-<%= blog._id %>" 
+                                   style="color: <%= likedBlogs.includes(blog._id.toString()) ? 'red' : 'white' %>; 
+                                          -webkit-text-stroke: <%= likedBlogs.includes(blog._id.toString()) ? '0' : '1px red' %>;">
+                                </i>
+                                <span style="color: white;" id="like-count-<%= blog._id %>">
+                                    <%= likeCountMap[blog._id.toString()] || 0 %>
+                                </span>
+                            </span>
+                            
+                            <!-- Follow Option -->
+                            <p class="text-primary follow-text" 
+                            onclick="followUser('<%= blog.createdBy._id %>', '<%= user._id %>')"
+                            style="cursor: pointer; font-weight: bold; margin-top: 5px;">
+                             <% 
+                                 const isFollowing = followedAuthors.some(author => author == blog.createdBy.toString());
+                             %>
+                             <%= isFollowing ? 'Following' : 'Follow' %>
+                         </p>
+
+                            <!-- Share Button -->
+                            <a 
+                            onclick="shareBlog('<%= blog.title %>', '<%= req.protocol %>://<%= req.get('host') %>/blog/<%= blog._id %>')"
+                            style="color: white; margin-top: 5px; cursor: pointer;">
+                            <i class="bi bi-share-fill"></i> share
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
+    
+    <script>
+        // Function to handle the sharing of a blog
+        function shareBlog(title, description, url) {
+            if (navigator.share) {
+                // Use the Web Share API
+                navigator.share({
+                    title: title,
+                    text: description,
+                    url: url
+                }).then(() => {
+                    console.log('Blog shared successfully');
+                }).catch((error) => {
+                    console.error('Error sharing blog:', error);
+                });
+            } else {
+                // Fallback for browsers that do not support the Web Share API
+                alert('Sharing is not supported on this device/browser. Copy the URL manually: ' + url);
+            }
+        }
+    </script>
+    
+    <!-- Include scripts partial for JavaScript files -->
+    <%- include('./partials/scripts') %>
+    <script>
+        async function likeBlog(blogId, userId) {
+            if (!userId) {
+                alert("You must be logged in to like a blog!");
+                return;
+            }
+        
+            console.log("Blog ID:", blogId); // Debugging blog ID
+            console.log("User ID:", userId); // Debugging user ID
+        
+            try {
+                const response = await fetch(`/blog/${blogId}/like`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ userId }),
+                });
+        
+                const data = await response.json();
+                console.log("Response Data:", data); // Debugging response
+        
+                if (data.success) {
+                    // Update the like count and toggle the heart color
+                    const likeCountElement = document.getElementById(`like-count-${blogId}`);
+                    const likeIconElement = document.getElementById(`like-icon-${blogId}`);
+        
+                    likeCountElement.textContent = data.likes;
+        
+                    if (likeIconElement.classList.contains("bi-heart")) {
+                        likeIconElement.classList.remove("bi-heart");
+                        likeIconElement.classList.add("bi-heart-fill");
+                        likeIconElement.style.color = "red";
+                    } else {
+                        likeIconElement.classList.remove("bi-heart-fill");
+                        likeIconElement.classList.add("bi-heart");
+                        likeIconElement.style.color = "white";
+                    }
+                } else {
+                    alert(data.message || "Something went wrong!");
+                }
+            } catch (err) {
+                console.error("Error:", err);
+                alert("Failed to like the blog. Please try again.");
+            }
+        }
+        
+        function followUser(authorId, currentUserId) {
+            if (!currentUserId) {
+                alert('You need to log in to follow users.');
+                return;
+            }
+        
+            // Check if the user is already following the author
+            const followButton = document.querySelector(`.follow-btn[onclick="followUser('${authorId}', '${currentUserId}')"]`);
+            if (followButton && followButton.textContent === 'Following') {
+                alert('You are already following this user!');
+                return;
+            }
+        
+            fetch(`/follow/${authorId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ currentUserId }), // Send current user ID in request body
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to follow the user.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.message === 'Already following!') {
+                    // Handle case where the user is already following
+                    alert('You are already following this user!');
+                    return;
+                }
+                
+                console.log('Followed successfully:', data);
+                alert('You are now following this user!');
+                
+                // Update the button text and disable it after a successful follow
+                if (followButton) {
+                    followButton.textContent = 'Following';
+                    followButton.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error following user:', error);
+                alert('Already following ....');
+            });
+        }
+        
+        function toggleBlogBody(blogId) {
+            const blogBody = document.getElementById(`blog-body-${blogId}`);
+            const button = document.getElementById(`toggle-btn-${blogId}`);
+        
+            if (blogBody.style.maxHeight === "none") {
+                // Collapse the body
+                blogBody.style.maxHeight = "50px";  // Adjust this value to your desired collapsed height
+                blogBody.style.overflow = "hidden";
+                button.textContent = "Read More";  // Change button text back to 'Read More'
+            } else {
+                // Expand the body to show full text
+                blogBody.style.maxHeight = "none";  // Remove max height to show full text
+                blogBody.style.overflow = "visible";
+                button.textContent = "Compress";  // Change button text to 'Compress'
+            }
+        }
+    </script>
+    <script>
+        function logAndRedirect(blogId, user) {
+            const path = '/blog/' + blogId + '?user=' + (user || null);
+            console.log('Redirecting to:', path);
+            window.location.href = path;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Blog - BlogifyX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url('/images/back2.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content {
+    margin-left: 20px; /* Reduced margin to move content closer to the left */
+    padding: 40px;
+    margin-right: 0px;
+    width: calc(100% - 40px); /* Adjust width to account for padding */
+}
+
+.form-container {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px rgba(235, 232, 232, 0.9);
+    margin: 10px auto;
+    max-width: 700px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 100%; /* Make it responsive */
+    box-sizing: border-box; /* Include padding and border in width */
+    margin-right: -30px;
+}
+
+        .form-label {
+            color: #dfdfdf;
+        }
+
+        .form-control {
+            background-color: #2c2c2c;
+            color: #f8f9fa;
+            border: 1px solid #a7a7a7;
+        }
+
+        .form-control:focus {
+            border-color: #c9c9c9;
+            box-shadow: 0 0 5px #ffffff;
+        }
+
+        .btn-primary {
+            background-color: #ffffff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #ffffff;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        /* AI Popup Styles */
+        .ai-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+        }
+
+        .ai-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .ai-popup-header h5 {
+            color: #fff;
+            margin: 0;
+        }
+
+        .ai-popup-header .close-btn {
+            color: #fff;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .ai-popup textarea {
+            width: 100%;
+            background-color: #2c2c2c;
+            color: #f8f9fa;
+            border: 1px solid #a7a7a7;
+            border-radius: 5px;
+            padding: 10px;
+            resize: none;
+        }
+
+        .ai-popup button {
+            margin-top: 15px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation partial for navbar -->
+    <%- include('./partials/nav') %>
+
+    <div class="main-container">
+        <!-- Side Menu -->
+        <%- include('./partials/sidemenu') %>
+
+        <!-- Content Area -->
+        <div class="content">
+            <div class="form-container">
+                <h1 class="page-title">Add a New Blog</h1>
+                <form action="/blog/add-new" method="POST" enctype="multipart/form-data">
+                    <!-- Cover Image -->
+                    <div class="mb-3">
+                        <label for="coverImage" class="form-label"><i class="bi bi-image"></i> Cover Image</label>
+                        <input type="file" class="form-control" id="coverImage" name="coverImage">
+                    </div>
+
+                    <!-- Blog Title -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label"><i class="bi bi-pencil"></i> Title</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Enter blog title" required>
+                    </div>
+
+                    <!-- Blog Body -->
+                    <div class="mb-3">
+                        <label for="body" class="form-label"><i class="bi bi-card-text"></i> Body</label>
+                        <div class="form-floating">
+                            <textarea class="form-control" id="floatingTextarea2" name="body" placeholder="Write your blog content here" style="height: 150px" required></textarea>
+                            <label for="floatingTextarea2">Blog Content</label>
+                        </div>
+                        <button type="button" id="useAIButton" class="btn btn-secondary mt-2"><i class="bi bi-lightbulb"></i> Use AI</button>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-send"></i> Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Popup -->
+    <div class="overlay" id="aiOverlay"></div>
+    <div class="ai-popup" id="aiPopup">
+        <div class="ai-popup-header">
+            <h5>AI Assistance</h5>
+            <button class="close-btn" id="closePopup">&times;</button>
+        </div>
+        <textarea id="aiPrompt" rows="3" placeholder="Enter your prompt here..."></textarea>
+        <button class="btn btn-primary w-100" id="getAIResult">Get Result</button>
+        <textarea id="aiResult" rows="5" readonly placeholder="AI result will appear here..." class="mt-3"></textarea>
+        <button class="btn btn-secondary w-100 mt-2" id="copyResult">Copy</button>
+    </div>
+
+    <!-- Include scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const aiPopup = document.getElementById('aiPopup');
+        const aiOverlay = document.getElementById('aiOverlay');
+        const useAIButton = document.getElementById('useAIButton');
+        const closePopup = document.getElementById('closePopup');
+        const getAIResult = document.getElementById('getAIResult');
+        const aiPrompt = document.getElementById('aiPrompt');
+        const aiResult = document.getElementById('aiResult');
+    
+        // Show the AI popup
+        useAIButton.addEventListener('click', () => {
+            aiPopup.style.display = 'block';
+            aiOverlay.style.display = 'block';
+        });
+    
+        // Close the AI popup
+        closePopup.addEventListener('click', () => {
+            aiPopup.style.display = 'none';
+            aiOverlay.style.display = 'none';
+            aiPrompt.value = ''; // Clear the prompt
+            aiResult.value = ''; // Clear the result
+        });
+    
+        // Get AI result
+        getAIResult.addEventListener('click', async () => {
+    const prompt = aiPrompt.value;
+    if (!prompt) {
+        alert('Please enter a prompt.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        aiResult.value = data.response; // Assuming the API returns { response: "AI generated text" }
+    } catch (error) {
+        console.error('Error fetching AI result:', error);
+        alert('Failed to get AI result. Please try again later.');
+    }
+});
+    
+        // Copy result to clipboard
+        document.getElementById('copyResult').addEventListener('click', () => {
+            aiResult.select();
+            document.execCommand('copy');
+            alert('Result copied to clipboard!');
+        });
+    
+        // Close popup when clicking outside of it
+        aiOverlay.addEventListener('click', () => {
+            closePopup.click();
+        });
+    </script>
+</body>

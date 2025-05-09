@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head') %>
+    <title>Sign In</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            /* Full-page background image */
+            background-image: url('/images/signupback.jpg'); /* Replace with the correct path to your image */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .signin-container {
+            background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            color: #333;
+        }
+
+        .signin-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        .signin-container form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .signin-container .form-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .signin-container input {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .signin-container input:focus {
+            outline: none;
+            border-color: #888;
+        }
+
+        .signin-container button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .signin-container button:hover {
+            background-color: #555;
+        }
+
+        .signin-container .form-check-label {
+            color: #555;
+        }
+
+        .signin-container .signup-option {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .signin-container .signup-option a {
+            color: #555;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .signin-container .signup-option a:hover {
+            text-decoration: underline;
+        }
+
+        .google-signin-button {
+            background-color: #DB4437; /* Google red */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .google-signin-button:hover {
+            background-color: #C33D2E;
+        }
+
+        .google-signin-button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+        @media(max-width:400px)
+    {
+      .signin-container{
+        margin-left: 30px;
+    margin-right: 30px;
+}
+      }
+    </style>
+</head>
+<body>
+    <div class="signin-container">
+        <h2>Sign In</h2>
+        <form action="/user/customsignin" method="POST">
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp" required>
+                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputPassword1" class="form-label">Password</label>
+                <input type="password" class="form-control" id="exampleInputPassword1" name="password" required>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1" name="terms">
+                <label class="form-check-label" for="exampleCheck1">Remember Me</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Sign In</button>
+        </form>
+
+        <!-- Google Login Button -->
+        <form action="/auth/google" method="GET">
+            <button type="submit" class="google-signin-button">
+                <img src="/images/icongoogle.png" alt="Google Logo"> Sign in with Google
+            </button>
+        </form>
+
+        <div class="signup-option">
+            Don't have an account? <a href="/user/signup">Sign Up</a>
+        </div>
+    </div>
+
+    <%- include('./partials/scripts') %>
+</body>
+</html>

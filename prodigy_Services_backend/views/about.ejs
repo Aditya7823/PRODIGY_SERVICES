@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - BlogifyX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212; /* Dark background */
+            color: #f8f9fa; /* Light text for contrast */
+            font-family: Arial, sans-serif;
+        }
+        .about-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #1c1c1c; /* Slightly lighter dark background */
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+        }
+        .section-heading {
+            font-size: 1.8rem;
+            color: #00bcd4; /* Cyan color for headings */
+            margin-bottom: 15px;
+        }
+        .head-photo img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            display: block;
+            margin: 0 auto 15px;
+        }
+        .btn-contact {
+            background-color: #00bcd4;
+            color: #121212;
+        }
+        .btn-contact:hover {
+            background-color: #008ba3;
+        }
+        .icon {
+            font-size: 1.2rem;
+            color: #00bcd4;
+        }
+        .icon:hover {
+            color: #008ba3;
+        }
+        @media (max-width: 400px) {
+
+.contact{
+    margin-left: 60px;
+    
+}
+        }
+    </style>
+</head>
+<body>
+    <%- include('./partials/nav') %>
+    <div class="d-flex">
+        <%- include('./partials/sidemenu') %>
+        <div class="container mt-3 flex-grow-1">
+            <div class="card-container contact" ">
+                <div class="about-container">
+                    <!-- Head Section -->
+                    <div class="text-center mb-4">
+                        <div class="head-photo">
+                            <img src="/images/about.jpg" alt="Head of BlogifyX">
+                        </div>
+                        <h1>About BlogifyX</h1>
+                        <p>Your ultimate platform for blogging, storytelling, and inspiration.</p>
+                    </div>
+            
+                    <!-- Mission Section -->
+                    <div class="mission">
+                        <h2 class="section-heading"><i class="bi bi-bullseye"></i> Our Mission</h2>
+                        <p>Our mission is to empower writers, bloggers, and content creators by providing an innovative and inclusive platform. BlogifyX bridges the gap between creativity and technology, offering tools that simplify the blogging process. We want to create a community where voices of all backgrounds are heard and celebrated.</p>
+                        <p>We believe that storytelling is one of the most powerful tools to connect people. BlogifyX aims to break barriers by offering a user-friendly interface that even a novice can use to share their story with the world. No matter where you're from, BlogifyX helps amplify your voice.</p>
+                        <p>From beginners exploring their passion for writing to seasoned bloggers looking to expand their reach, BlogifyX strives to be the go-to destination for sharing authentic stories and building meaningful connections.</p>
+                    </div>
+            
+                    <!-- Vision Section -->
+                    <div class="vision">
+                        <h2 class="section-heading"><i class="bi bi-lightbulb"></i> Our Vision</h2>
+                        <p>We envision BlogifyX as a global hub for creativity, learning, and expression. In a world increasingly driven by digital content, we aim to empower everyone to contribute to the ever-growing tapestry of ideas, stories, and knowledge.</p>
+                        <p>BlogifyX strives to build a future where every individual has access to a supportive and inclusive platform for self-expression. Our vision is to foster a vibrant community of diverse voices that inspire change, promote understanding, and fuel innovation.</p>
+                        <p>Looking ahead, BlogifyX aims to integrate cutting-edge technologies such as AI-powered content insights, personalized reader recommendations, and advanced tools to enhance the writer's journey, making blogging more accessible and impactful.</p>
+                    </div>
+            
+                    <!-- Introduction to the Head -->
+                    <div class="head-info">
+                        <h2 class="section-heading"><i class="bi bi-person-circle"></i> Meet the Head of BlogifyX</h2>
+                        <div class="text-center">
+                            <img src="/images/mypic.png" alt="Aditya Jaiswal" class="rounded-circle mb-4" style="width: 120px; height: 120px;">
+                            <h3>Aditya Jaiswal</h3>
+                            <p>Founder and Visionary of BlogifyX</p>
+                        </div>
+                        <p>Aditya Jaiswal is the driving force behind BlogifyX, a passionate innovator with a mission to revolutionize the blogging experience. With a background in technology and a deep understanding of the content creation process, Aditya founded BlogifyX to empower writers worldwide.</p>
+                        <p>Aditya believes in building a platform that supports storytelling at its core, inspiring people to share their unique voices. Through BlogifyX, he continues to lead the charge in creating a space where creativity meets technology seamlessly.</p>
+                        <p>If you’d like to get in touch with Aditya or learn more about his vision for BlogifyX, please use the contact information below. ok</p>
+                    </div>
+            
+                    <!-- Contact Information -->
+                    <div class="contact-info text-center mt-4">
+                        <h2 class="section-heading"><i class="bi bi-envelope"></i> Contact Aditya Jaiswal</h2>
+                        <p>Email: <a href="mailto:aditya.jaiswal@blogifyx.com" style="color: #00bcd4;">adityajaiswal7823@gmail.com</a></p>
+                        <p>Phone: <a href="tel:+1234567890" style="color: #00bcd4;">+91 7823097407</a></p>
+                    </div>
+            
+                    <!-- Call-to-Action -->
+                    <div class="text-center mt-4">
+                        <h2 class="section-heading"><i class="bi bi-people"></i> Join Us</h2>
+                        <p>Become a part of the BlogifyX journey and let’s create a world full of stories, inspiration, and creativity.</p>
+                        <a href="contact" class="btn btn-contact"><i class="bi bi-envelope"></i> Contact Us</a>
+                    </div>
+                </div>
+            
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

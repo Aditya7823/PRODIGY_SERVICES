@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Comment Generator</title>
+  <script>
+    async function getOutput() {
+      const userInput = document.getElementById("userInput").value;
+      const outputDiv = document.getElementById("output");
+
+      // Show loading text while waiting for response
+      outputDiv.textContent = "Generating comment...";
+
+      // Log the input value for debugging
+      console.log("User Input:", userInput);
+
+      // Check if user input is empty
+      if (!userInput.trim()) {
+        outputDiv.textContent = "Please enter a prompt!";
+        return;
+      }
+
+      try {
+        const response = await fetch('/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ input: userInput })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          outputDiv.textContent = `Error: ${errorData.error}`;
+          return;
+        }
+
+        const data = await response.json();
+        outputDiv.textContent = data.output || "No output generated.";
+      } catch (error) {
+        console.error("Error fetching the data:", error);
+        outputDiv.textContent = "An error occurred while generating the comment.";
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>Generate Blog Comment</h1>
+  <textarea id="userInput" rows="4" cols="50" placeholder="Enter your prompt here..."></textarea><br><br>
+  <button onclick="getOutput()">Generate Comment</button>
+
+  <h3>Generated Output:</h3>
+  <div id="output"></div>
+</body>
+</html>
