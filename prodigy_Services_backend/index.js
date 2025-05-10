@@ -69,6 +69,11 @@ app.use((req, res, next) => {
     next();
 });
 
+const messRoutes = require('./routes/messRoutes');
+
+// Use the routes
+app.use(messRoutes);
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // Serve static files
@@ -1173,9 +1178,24 @@ app.get('/:id' , async (req, res) => {
 app.use((req, res, next) => {
     res.status(404).render('404', { user: req.user });
 });
+// Example Express route to fetch mess service users
+app.get('/api/mess-service-providers', async (req, res) => {
+    try {
+      const messUsers = await User.find({ role: 'MESS_SERVICE' });
+      console.log(messUsers);  // Debugging: Log the result
+      res.json(messUsers);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching mess users" });
+    }
+  });
+  
 
+  
 // Start the server
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
     console.log("Server has been started on port", port);
 });
+
+
+
