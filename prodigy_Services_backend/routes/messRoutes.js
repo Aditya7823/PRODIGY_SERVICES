@@ -1,16 +1,120 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/user'); // Adjust the path based on your project structure
+const User = require('../models/user');
+const Mess = require('../models/Mess');
 
-// Define the route for fetching mess service providers
+// Fetch all mess service providers
 router.get('/api/mess-service-providers', async (req, res) => {
   try {
-    // Find users with the role 'MESS_SERVICE', excluding 'password' and 'salt' fields
     const messUsers = await User.find({ role: 'MESS_SERVICE' }).select('-password -salt');
     res.json(messUsers);
   } catch (error) {
     res.status(500).json({ message: "Error fetching mess users" });
   }
 });
+
+// Fetch specific mess + user account details by email
+router.get('/api/mess-account/:email', async (req, res) => {
+  try {
+    const mess = await Mess.findOne({ email: req.params.email });
+    if (!mess) return res.status(404).json({ error: 'Mess not found' });
+
+    const user = await User.findOne({ email: req.params.email }).select('-password -salt');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json({ ...mess.toObject(), user: user.toObject() });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ✅ Update mess account details (excluding email)
+router.put('/api/mess-account/:email', async (req, res) => {
+  const { email } = req.params;
+  const {
+    fullname,
+    details,
+    pricing,
+    menu,
+    contact,
+  } = req.body;
+
+  try {
+    const updatedMess = await Mess.findOneAndUpdate(
+      { email },
+      {
+        $set: {
+          fullname,
+          details,
+          pricing,
+          menu,
+          contact,
+        },
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedMess) {
+      return res.status(404).json({ error: 'Mess account not found' });
+    }
+
+    res.status(200).json({
+      message: 'Mess account updated successfully',
+      mess: updatedMess,
+    });
+  } catch (err) {
+    console.error('Error updating mess details:', err);
+    res.status(500).json({ error: 'Server error while updating mess account' });
+  }
+});
+
+
+
+router.post('/api/mess/feedback', async (req, res) => {
+  const { rating, comments, name: fullname, messEmail } = req.body;
+
+  try {
+    const mess = await Mess.findOne({ email: messEmail });
+    if (!mess) return res.status(404).json({ error: "Mess not found" });
+
+    mess.feedback.push({
+      user: fullname,
+      rating,
+      comments,
+      date: new Date()
+    });
+
+    await mess.save();
+    res.status(200).json({ message: "Feedback submitted" });
+  } catch (error) {
+    console.error("Error submitting feedback:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.post('/api/mess/add-update', async (req, res) => {
+  const { message, messEmail } = req.body;
+  // assuming auth middleware attaches user
+
+  try {
+    // Find Mess by email (sent from frontend)
+    const mess = await Mess.findOne({ email: messEmail });
+    if (!mess) return res.status(404).json({ error: "Mess not found" });
+
+    // Add the update entry with current date and message
+    mess.updates.push({
+      message,
+      date: new Date(),
+    });
+
+    await mess.save();
+    res.status(200).json({ message: "Update added successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
 
 module.exports = router;

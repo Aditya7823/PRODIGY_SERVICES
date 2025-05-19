@@ -34,11 +34,16 @@ router.post('/signin', async (req, res) => {
     }
 });
 
+
 router.post('/customsignin', async (req, res) => {
     const { email, password } = req.body;
 
     try {
+        // Get the token by validating credentials
         const token = await User.matchPasswordAndGenerateToken(email, password);
+
+        // Manually fetch the user from the DB
+        const user = await User.findOne({ email }).select('-password -salt');
 
         // Set the token in a cookie
         res.cookie("token", token, {
@@ -46,14 +51,16 @@ router.post('/customsignin', async (req, res) => {
             maxAge: 60 * 60 * 1000, // 1 hour
         });
 
-        // Send a success response with optional redirect path
+        // Redirect logic
         const redirectTo = req.session.returnTo || '/home';
         delete req.session.returnTo;
 
+        // Send success response
         res.status(200).json({
             success: true,
             message: "Login successful",
-            redirectTo: redirectTo
+            redirectTo: redirectTo,
+            user: user
         });
 
     } catch (error) {

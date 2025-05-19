@@ -13,15 +13,20 @@ const transporter = nodemailer.createTransport({
 const sendWelcomeEmail = async (toEmail, userName) => {
     try {
         const mailOptions = {
-            from: '"BlogifyX Team" <adityajaiswal7823@gmail.com>', // Sender name and email
+            from: '"Prodigy Services Team" <adityajaiswal7823@gmail.com>', // Sender name and email
             to: toEmail, // Recipient email
-            subject: "Welcome to BlogifyX!", // Email subject
+            subject: "Welcome to Prodigy Services!", // Updated subject
             html: `
-                <h1>Welcome to BlogifyX, ${userName}!</h1>
-                <p>We're thrilled to have you join our platform. Start sharing your stories and connecting with the community today!</p>
-                <p>Visit our website to get started: <a href="http://localhost:3000">BlogifyX</a></p>
+                <h1>Welcome to Prodigy Services, ${userName}!</h1>
+                <p>We're excited to have you on board with Prodigy Services. Start exploring our premium services and take your experience to the next level!</p>
+                <p>Our services include:</p>
+                <ul>
+                    <li><strong>Custom Solutions:</strong> Tailored services designed for your needs.</li>
+                    <li><strong>24/7 Support:</strong> Our dedicated team is always here to help.</li>
+                    <li><strong>Exclusive Offers:</strong> Enjoy special deals and discounts on our services.</li>
+                </ul>
                 <br>
-                <p>Best regards,<br>The BlogifyX Team</p>
+                <p>Best regards,<br>The Prodigy Services Team</p>
             `,
         };
 
@@ -31,5 +36,6 @@ const sendWelcomeEmail = async (toEmail, userName) => {
         console.error("Error sending email:", error);
     }
 };
+
 
 module.exports = sendWelcomeEmail;

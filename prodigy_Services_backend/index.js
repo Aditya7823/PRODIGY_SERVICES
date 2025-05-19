@@ -10,6 +10,7 @@ const app = express();
 const Follow = require("./models/Follow");
 const Like = require("./models/Like");
 const userRouter = require('./routes/user');
+const Mess = require('./models/Mess');
 const blogRouter = require('./routes/blog');
 const Blog = require('./models/blog'); // Correct import
 const Notification = require("./models/notification");// Correct import
@@ -256,7 +257,6 @@ app.post('/user/send-otp', async (req, res) => {
   
     console.log('Session in signup route:', req.session);
   
-    // Check OTP expiration
     if (Date.now() > req.session.otpExpiration) {
       return res.status(400).send("OTP has expired. Please request a new one.");
     }
@@ -266,22 +266,40 @@ app.post('/user/send-otp', async (req, res) => {
     }
   
     try {
-      // Check if the email already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res.status(400).send("Email already exists. Please use a different email.");
       }
   
-      // Create a new user with role and location
+      // Ensure GeoJSON structure is preserved
+      const formattedLocation = {
+        type: 'Point',
+        coordinates: location?.coordinates || [0, 0]
+      };
+  
+      // Create the new user
       const newUser = await User.create({
         fullname,
         email,
         password,
-        role: role || "USER", // fallback to "USER" if role is not provided
-        location
+        role: role || "USER",
+        location: formattedLocation,
       });
   
-      // Send welcome email (optional)
+      // If the role is MESS_SERVICE, also create a Mess entry
+      if (role === "MESS_SERVICE") {
+        await Mess.create({
+          fullname,
+          email,
+          contact: {
+            location: {
+              latitude: formattedLocation.coordinates[1],
+              longitude: formattedLocation.coordinates[0],
+            }
+          }
+        });
+      }
+  
       await sendWelcomeEmail(email, fullname);
   
       res.redirect("/user/signin");
