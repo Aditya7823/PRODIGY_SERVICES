@@ -845,6 +845,7 @@ app.get('/home', async (req, res) => {
     const { title } = req.query; // Extract 'title' from query parameters
 
     try {
+        console.log("home route accessed with title:", title);
         // Fetch notifications for the logged-in user
         const notifications = await Notification.find({ receiver: req.user._id })
             .sort({ createdAt: -1 }) // Sort by most recent
@@ -912,6 +913,22 @@ app.get('/home', async (req, res) => {
         res.status(500).send("An error occurred while loading the home page.");
     }
 });
+
+app.get('/api/home', async (req, res) => {
+    try {
+        console.log("API home route accessed");
+
+        // Fetch all blogs sorted by updatedAt in descending order (most recent first)
+        const allBlogs = await Blog.find({}).sort({ updatedAt: -1 });
+
+        res.status(200).json({ success: true, blogs: allBlogs });
+    } catch (error) {
+        console.error("Error fetching blogs:", error);
+        res.status(500).json({ success: false, message: "An error occurred while fetching blogs." });
+    }
+});
+
+
 
  
  app.post("/follow/:authorId", async (req, res) => {
