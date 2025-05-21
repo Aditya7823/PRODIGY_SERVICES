@@ -11,6 +11,7 @@ const Follow = require("./models/Follow");
 const Like = require("./models/Like");
 const userRouter = require('./routes/user');
 const Mess = require('./models/Mess');
+const RoomRentalService = require('./models/Room');
 const blogRouter = require('./routes/blog');
 const Blog = require('./models/blog'); // Correct import
 const Notification = require("./models/notification");// Correct import
@@ -71,9 +72,10 @@ app.use((req, res, next) => {
 });
 
 const messRoutes = require('./routes/messRoutes');
-
+const RoomRoutes = require('./routes/RoomRoutes');
 // Use the routes
 app.use(messRoutes);
+app.use(RoomRoutes);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -299,7 +301,19 @@ app.post('/user/send-otp', async (req, res) => {
           }
         });
       }
-  
+  if (role === "ROOM_RENTAL_SERVICE") {
+  await RoomRentalService.create({
+    fullname,
+    email,
+    contact: {
+      location: {
+        latitude: formattedLocation.coordinates[1],
+        longitude: formattedLocation.coordinates[0],
+      }
+    }
+  });
+}
+
       await sendWelcomeEmail(email, fullname);
   
       res.redirect("/user/signin");
