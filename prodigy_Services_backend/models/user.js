@@ -30,8 +30,8 @@ const userSchema = new mongoose.Schema({
             "ADMIN",
             "MESS_SERVICE",
             "ROOM_RENTAL_SERVICE",
-            "CAFE_SERVICE",
-            "TEA_POINT",
+            "CAFE_SERVICE / TEA_POINT",
+           
             "VENDOR",
             "TUTOR_SERVICE",
             "OTHER_SERVICE"

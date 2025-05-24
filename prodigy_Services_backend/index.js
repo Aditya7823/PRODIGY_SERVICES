@@ -11,6 +11,7 @@ const Follow = require("./models/Follow");
 const Like = require("./models/Like");
 const userRouter = require('./routes/user');
 const Mess = require('./models/Mess');
+ const Cafe = require('./models/Cafe');
 const RoomRentalService = require('./models/Room');
 const blogRouter = require('./routes/blog');
 const Blog = require('./models/blog'); // Correct import
@@ -18,6 +19,7 @@ const Notification = require("./models/notification");// Correct import
 const Comment = require('./models/blog'); // Correct import
 const User = require('./models/user'); // Correct import
 const cors = require("cors");
+
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const mongoose = require('mongoose');
@@ -73,6 +75,8 @@ app.use((req, res, next) => {
 
 const messRoutes = require('./routes/messRoutes');
 const RoomRoutes = require('./routes/RoomRoutes');
+const cafeRoutes = require('./routes/CafeRoutes');
+app.use(cafeRoutes);
 // Use the routes
 app.use(messRoutes);
 app.use(RoomRoutes);
@@ -252,7 +256,7 @@ app.post('/user/send-otp', async (req, res) => {
       res.status(500).send("Error sending OTP. Please try again.");
     }
   });
-  
+ 
   // Signup route with OTP verification
   app.post('/user/signup', async (req, res) => {
     const { fullname, email, password, otp, role, location } = req.body;
@@ -314,6 +318,20 @@ app.post('/user/send-otp', async (req, res) => {
   });
 }
 
+
+
+if (role === "CAFE_SERVICE / TEA_POINT") {
+  await Cafe.create({
+    fullname,
+    email,
+    contact: {
+      location: {
+        latitude: formattedLocation.coordinates[1],
+        longitude: formattedLocation.coordinates[0],
+      }
+    }
+  });
+}
       await sendWelcomeEmail(email, fullname);
   
       res.redirect("/user/signin");
