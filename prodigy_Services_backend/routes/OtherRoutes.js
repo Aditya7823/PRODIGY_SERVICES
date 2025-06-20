@@ -2,30 +2,58 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const Other = require('../models/Other');
-router.get('/api/other-service-providers', async (req, res) => {
-  try {
-    console.log('Fetching cafe service providers...');
-    const otherUsers = await User.find({ role: 'OTHER_SERVICE' }).select('-password -salt');
-    res.json(otherUsers);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching cafe service providers" });
-  }
-});
+
 // Node.js (Express + Mongoose)
-router.get('/api/other-service-providers/:type', async (req, res) => {
+router.get('/api/other-service-providers', async (req, res) => {
+  const { lat, lng, type } = req.query;
+
+  if (!lat || !lng || !type) {
+    return res.status(400).json({ message: "Missing latitude, longitude, or service type." });
+  }
+
+  const userLatitude = parseFloat(lat);
+  const userLongitude = parseFloat(lng);
+
   try {
-    const decodedType = decodeURIComponent(req.params.type);
-    console.log("Received type:", decodedType); // Debug log
+    const allVendors = await User.find({
+      role: 'OTHER_SERVICE',
+      location: { $exists: true, $ne: null },
+      "location.coordinates.0": { $exists: true }
+    });
 
-    const providers = await Other.find({ serviceCategories: decodedType });
+    const matchingEmails = await Other.find({ serviceCategories: type }).distinct('email');
 
-    console.log("Providers found:", providers.length);
-    res.json(providers);
-  } catch (error) {
-    console.error('Error fetching other service providers:', error); // Full error
-    res.status(500).json({ error: 'Server Error', message: error.message });
+    const relevantEmails = allVendors
+      .map(user => user.email)
+      .filter(email => matchingEmails.includes(email));
+
+    if (relevantEmails.length === 0) {
+      return res.json([]);
+    }
+
+    const result = await User.aggregate([
+      {
+        $geoNear: {
+          near: { type: "Point", coordinates: [userLongitude, userLatitude] },
+          distanceField: "distance",
+          maxDistance: 5000,
+          spherical: true,
+          query: {
+            email: { $in: relevantEmails },
+            role: 'OTHER_SERVICE'
+          }
+        }
+      }
+    ]);
+
+    res.json(result);
+  } catch (err) {
+    console.error("GeoNear error:", err);
+    res.status(500).json({ message: "Server error while fetching nearby service providers." });
   }
 });
+
+
 router.get('/api/other-services/provider/:email', async (req, res) => {
   try {
     const email = decodeURIComponent(req.params.email);

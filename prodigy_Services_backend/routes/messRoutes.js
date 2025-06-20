@@ -6,10 +6,44 @@ const Mess = require('../models/Mess');
 // Fetch all mess service providers
 router.get('/api/mess-service-providers', async (req, res) => {
   try {
-    const messUsers = await User.find({ role: 'MESS_SERVICE' }).select('-password -salt');
+ const { lat, lng } = req.query;
+
+
+
+    if (!lat || !lng) {
+      return res.status(400).json({ message: 'Latitude and longitude are required.' });
+    }
+
+    const latNum = parseFloat(lat);
+    const lngNum = parseFloat(lng);
+
+    const messUsers = await User.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: "Point",
+            coordinates: [lngNum, latNum] // [longitude, latitude]
+          },
+          distanceField: "distance", // returns calculated distance in meters
+          spherical: true,
+          maxDistance: 5000 // 5km radius
+        }
+      },
+      {
+        $match: { role: 'MESS_SERVICE' }
+      },
+      {
+        $project: {
+          password: 0,
+          salt: 0
+        }
+      }
+    ]);
+
     res.json(messUsers);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching mess users" });
+    console.error("Error fetching sorted nearby mess users:", error);
+    res.status(500).json({ message: "Error fetching nearby mess users" });
   }
 });
 

@@ -59,14 +59,45 @@ router.post('/api/room-update/:email', upload.array('images', 5), async (req, re
 // Fetch all room rental service providers
 router.get('/api/room-rental-service-providers', async (req, res) => {
   try {
-     
-    const roomUsers = await User.find({ role: 'ROOM_RENTAL_SERVICE' }).select('-password -salt');
+    const { lat, lng } = req.query;
+
+    if (!lat || !lng) {
+      return res.status(400).json({ message: 'Latitude and longitude are required.' });
+    }
+
+    const latNum = parseFloat(lat);
+    const lngNum = parseFloat(lng);
+
+    const roomUsers = await User.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: "Point",
+            coordinates: [lngNum, latNum] // longitude first
+          },
+          distanceField: "distance",
+          spherical: true,
+          maxDistance: 5000 // 5 km
+        }
+      },
+      {
+        $match: { role: 'ROOM_RENTAL_SERVICE' }
+      },
+      {
+        $project: {
+          password: 0,
+          salt: 0
+        }
+      }
+    ]);
+
     res.json(roomUsers);
   } catch (error) {
-    console.error("Error fetching room rental users:", error);
-    res.status(500).json({ message: "Error fetching room rental users" });
+    console.error("Error fetching nearby room rental users:", error);
+    res.status(500).json({ message: "Error fetching nearby room rental users" });
   }
 });
+
 // Add update message for a room by email
 router.post('/api/roomaccount/update/:email', async (req, res) => {
   try {
