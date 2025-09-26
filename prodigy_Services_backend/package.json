@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon start",
-    "dev": "nodemon index.js --ext js,json,ejs,html"
-  },
+  "start": "node index.js",
+  "dev": "nodemon index.js --ext js,json,ejs,html"
+}
+,
   "author": "",
   "license": "ISC",
   "description": "",

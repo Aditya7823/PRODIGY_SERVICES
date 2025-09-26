@@ -59,6 +59,7 @@ router.post('/api/room-update/:email', upload.array('images', 5), async (req, re
 // Fetch all room rental service providers
 router.get('/api/room-rental-service-providers', async (req, res) => {
   try {
+    console.log('Fetching room rental service providers...');
     const { lat, lng } = req.query;
 
     if (!lat || !lng) {
@@ -77,7 +78,7 @@ router.get('/api/room-rental-service-providers', async (req, res) => {
           },
           distanceField: "distance",
           spherical: true,
-          maxDistance: 5000 // 5 km
+          maxDistance: 50000 // 5 km
         }
       },
       {

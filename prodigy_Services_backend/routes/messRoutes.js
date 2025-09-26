@@ -8,7 +8,7 @@ router.get('/api/mess-service-providers', async (req, res) => {
   try {
  const { lat, lng } = req.query;
 
-
+ console.log('Fetching mess service providers...');
 
     if (!lat || !lng) {
       return res.status(400).json({ message: 'Latitude and longitude are required.' });
@@ -16,7 +16,7 @@ router.get('/api/mess-service-providers', async (req, res) => {
 
     const latNum = parseFloat(lat);
     const lngNum = parseFloat(lng);
-
+5
     const messUsers = await User.aggregate([
       {
         $geoNear: {
@@ -26,7 +26,7 @@ router.get('/api/mess-service-providers', async (req, res) => {
           },
           distanceField: "distance", // returns calculated distance in meters
           spherical: true,
-          maxDistance: 5000 // 5km radius
+          maxDistance: 50000 // 5km radius
         }
       },
       {
@@ -55,7 +55,7 @@ router.get('/api/mess-account/:email', async (req, res) => {
 
     const user = await User.findOne({ email: req.params.email }).select('-password -salt');
     if (!user) return res.status(404).json({ error: 'User not found' });
-
+v
     res.json({ ...mess.toObject(), user: user.toObject() });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
